@@ -1,0 +1,68 @@
+# 文件分类整理工具
+
+
+import os
+import shutil
+
+# 分类
+leixing = {
+    '图片': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'],
+    '文档': ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.pptx', '.txt', '.md'],
+    '音视频': ['.mp4', '.avi', '.mkv', '.mp3', '.wav', '.flac'],
+    '压缩包': ['.zip', '.rar', '.7z'],
+    '代码': ['.py', '.js', '.html', '.css', '.java', '.cpp', '.c', '.json'],
+    '其他': []
+}
+
+def zhengli(lujing):
+    # 检查路径
+    if not os.path.exists(lujing):
+        print('路径不对')
+        return
+
+    bianhao = 0  # 统计数量
+
+    # 遍历所有文件
+    for wenjian in os.listdir(lujing):
+        wenjian_lujing = os.path.join(lujing, wenjian)
+
+        if not os.path.isfile(wenjian_lujing):
+            continue
+
+        # 获取后缀名
+        houzhui = os.path.splitext(wenjian)[1].lower()
+
+        # 判断类型
+        mubiao = '其他'
+        for lei, houzhui_list in leixing.items():
+            if houzhui in houzhui_list:
+                mubiao = lei
+                break
+
+        # 创建分类目录
+        mubiao_lujing = os.path.join(lujing, mubiao)
+        if not os.path.exists(mubiao_lujing):
+            os.mkdir(mubiao_lujing)
+
+        # 如果重名就加个数字
+        xin_lujing = os.path.join(mubiao_lujing, wenjian)
+        if os.path.exists(xin_lujing):
+            ming = os.path.splitext(wenjian)[0]
+            xin_lujing = os.path.join(mubiao_lujing, ming + '_1' + houzhui)
+
+        # 移动
+        shutil.move(wenjian_lujing, xin_lujing)
+        bianhao += 1
+        print(f'  [{bianhao}] {wenjian} 移动到 {mubiao}')
+
+    print(f'完成，一共整理了 {bianhao} 个文件')
+
+if __name__ == '__main__':
+    import sys
+    print('===== 文件整理小工具 =====')
+    if len(sys.argv) > 1:
+        folder = sys.argv[1]
+    else:
+        folder = input('输入要整理的文件夹路径: ')
+    zhengli(folder)
+    input('按回车键退出...')
